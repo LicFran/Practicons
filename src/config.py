@@ -46,19 +46,3 @@ TABLE_HEADERS = [
     "Total Mano de Obra",
     "Total General"
 ]
-
-# Configuraciones específicas para presupuestos de construcción
-ESTIMATE_SECTIONS = [
-    "Preliminares",
-    "Cimentación",
-    "Estructura",
-    "Albañilería",
-    "Instalaciones",
-    "Acabados",
-    "Carpintería",
-    "Herrería",
-    "Vidrios y Cristales",
-    "Pintura",
-    "Obras Exteriores",
-    "Limpieza"
-] 
