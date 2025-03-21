@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Módulo dde configuración para PráctiCos
+Módulo de configuración para PractiCons
 """
 
 import os
