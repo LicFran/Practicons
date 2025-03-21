@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Módulo de configuración para PráctiCos
+Módulo dde configuración para PráctiCos
 """
 
 import os
