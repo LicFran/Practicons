@@ -23,8 +23,8 @@ OCR_LANGUAGE = os.getenv("OCR_LANGUAGE", "spa")
 OCR_DPI = int(os.getenv("OCR_DPI", "300"))
 
 # Configuración de IA
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-USE_AI_EXTRACTION = os.getenv("USE_AI_EXTRACTION", "True").lower() in ("true", "1", "t")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+USE_AI_EXTRACTION = False  # Desactivado explícitamente
 
 # Configuración de procesamiento de PDF
 IMAGE_FORMAT = "PNG"
