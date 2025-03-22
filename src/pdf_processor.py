@@ -47,10 +47,12 @@ class PDFProcessor:
         self.pages = []
         self.text_content = ""
         self.extracted_data = {
-            "metadata": {},
+            "metadata": {},            # Mantenemos esto para compatibilidad
+            "datos_proyecto": {},      # Nueva estructura para datos del proyecto
             "sections": {},
             "tables": [],
-            "summary": {}
+            "materiales": [],          # Nueva estructura para materiales
+            "summary": {}              # Mantenemos esto para compatibilidad
         }
         self.ai_extractor = AIExtractor()
         
@@ -251,11 +253,24 @@ class PDFProcessor:
                 self.extracted_data
             )
             
-            # Actualizar los datos extraídos con información mejorada por IA
-            self.extracted_data.update(enhanced_data)
+            # Extraer y actualizar datos del proyecto y materiales
+            if "datos_proyecto" in enhanced_data:
+                self.extracted_data["datos_proyecto"] = enhanced_data["datos_proyecto"]
+                # También actualizar metadatos para compatibilidad
+                self.extracted_data["metadata"].update(enhanced_data["datos_proyecto"])
             
-            # Ya no generamos un resumen del presupuesto
-            # El método generate_summary ahora devuelve un diccionario vacío
+            if "materiales" in enhanced_data:
+                self.extracted_data["materiales"] = enhanced_data["materiales"]
+            
+            # Mantener compatibility con estructuras antiguas si existen
+            if "enhanced_metadata" in enhanced_data:
+                self.extracted_data["datos_proyecto"].update(enhanced_data["enhanced_metadata"])
+                self.extracted_data["metadata"].update(enhanced_data["enhanced_metadata"])
+            
+            if "key_items" in enhanced_data:
+                self.extracted_data["materiales"].extend(enhanced_data["key_items"])
+            
+            # El resumen está deshabilitado
             self.extracted_data["summary"] = {}
             
             logger.info("Aplicada extracción por IA con éxito")

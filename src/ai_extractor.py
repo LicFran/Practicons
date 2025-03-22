@@ -82,20 +82,19 @@ class AIExtractor:
         
         # Crear un prompt para extraer datos del presupuesto
         prompt_template = """
-        Eres un experto en presupuestos. 
-        Estás analizando un documento de presupuesto de construcción. 
+        Extrae la siguiente información del texto del documento:
         
         El documento contiene el siguiente texto:
         {text_content}
         
-        Basándote en el texto anterior, extrae ÚNICAMENTE la siguiente información en formato JSON:
+        Extrae ÚNICAMENTE los siguientes datos en formato JSON:
         
-        1. Metadatos del proyecto: cliente, celular, telefono_fijo, direccion, fecha, e-mail, orden_trabajo
-        2. Detalle de materiales y precios: material, unidades, precio_unitario, precio_total, cantidad_m2, mano_obra, total_material, total_mano_obra, total_general
+        1. Datos del proyecto: cliente, celular, telefono_fijo, direccion, fecha, e-mail, orden_trabajo
+        2. Lista de materiales: material, unidades, precio_unitario, precio_total, cantidad_m2, mano_obra, total_material, total_mano_obra, total_general
         
         Devuelve el resultado como un objeto JSON con la siguiente estructura:
         {{
-            "enhanced_metadata": {{
+            "datos_proyecto": {{
                 "client": "string",
                 "phone": "string",
                 "phone_fixed": "string",
@@ -108,7 +107,7 @@ class AIExtractor:
                 "total_material": "number",
                 "total_general": "number"
             }},
-            "key_items": [
+            "materiales": [
                 {{
                     "material": "string",
                     "units": "string",
@@ -174,29 +173,28 @@ class AIExtractor:
         try:
             import openai
             
-            # Configure the API key
+            # Configurar la clave API
             openai.api_key = self.api_key
             
-            # Create a truncated version of the text if it's too long
-            max_content_length = 4000  # Adjust based on the model's context window
+            # Crear una versión truncada del texto si es demasiado largo
+            max_content_length = 4000  # Ajustar según la ventana de contexto del modelo
             truncated_text = text_content[:max_content_length] if len(text_content) > max_content_length else text_content
             
-            # Create the prompt
+            # Crear el prompt
             prompt = f"""
-            Eres un experto en presupuestos. 
-            Estás analizando un documento de presupuesto de construcción. 
+            Extrae la siguiente información del texto del documento:
             
             El documento contiene el siguiente texto:
             {truncated_text}
             
-            Basándote en el texto anterior, extrae ÚNICAMENTE la siguiente información en formato JSON:
+            Extrae ÚNICAMENTE los siguientes datos en formato JSON:
             
-            1. Metadatos del proyecto: cliente, celular, telefono_fijo, direccion, fecha, e-mail, orden_trabajo
-            2. Detalle de materiales y precios: material, unidades, precio_unitario, precio_total, cantidad_m2, mano_obra, total_material, total_mano_obra, total_general
+            1. Datos del proyecto: cliente, celular, telefono_fijo, direccion, fecha, e-mail, orden_trabajo
+            2. Lista de materiales: material, unidades, precio_unitario, precio_total, cantidad_m2, mano_obra, total_material, total_mano_obra, total_general
             
             Devuelve el resultado como un objeto JSON con la siguiente estructura:
             {{
-                "enhanced_metadata": {{
+                "datos_proyecto": {{
                     "client": "string",
                     "phone": "string",
                     "phone_fixed": "string",
@@ -209,7 +207,7 @@ class AIExtractor:
                     "total_material": "number",
                     "total_general": "number"
                 }},
-                "key_items": [
+                "materiales": [
                     {{
                         "material": "string",
                         "units": "string",
@@ -220,7 +218,7 @@ class AIExtractor:
             }}
             """
             
-            # Call the OpenAI API with updated client
+            # Llamar a la API de OpenAI con el cliente actualizado
             client = openai.OpenAI(api_key=self.api_key)
             response = client.completions.create(
                 model="gpt-3.5-turbo-instruct",
@@ -229,12 +227,12 @@ class AIExtractor:
                 temperature=0.2
             )
             
-            # Extract the response text
+            # Extraer el texto de la respuesta
             result = response.choices[0].text.strip()
             
-            # Process the result
+            # Procesar el resultado
             try:
-                # Extract the JSON data (handle case where there might be markdown code blocks)
+                # Extraer los datos JSON (manejar caso donde puede haber bloques de código markdown)
                 if "```json" in result:
                     json_str = result.split("```json")[1].split("```")[0].strip()
                 elif "```" in result:
@@ -242,27 +240,16 @@ class AIExtractor:
                 else:
                     json_str = result.strip()
                 
-                # Parse the JSON data
+                # Analizar los datos JSON
                 enhanced_data = json.loads(json_str)
                 return enhanced_data
             
             except (json.JSONDecodeError, IndexError) as e:
-                logger.error(f"Error parsing AI response: {str(e)}")
+                logger.error(f"Error al analizar la respuesta de la IA: {str(e)}")
                 return {}
         
         except Exception as e:
-            logger.error(f"Error making direct API call: {str(e)}")
+            logger.error(f"Error al realizar llamada directa a la API: {str(e)}")
             return {}
     
-    def generate_summary(self, extracted_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Función deshabilitada - ya no genera resúmenes
-        
-        Args:
-            extracted_data (dict): Los datos extraídos
-            
-        Returns:
-            dict: Diccionario vacío
-        """
-        logger.info("La generación de resúmenes está deshabilitada")
-        return {} 
+    # La función generate_summary ha sido eliminada por estar deshabilitada y no ser utilizada 
