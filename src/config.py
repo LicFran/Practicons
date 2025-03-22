@@ -46,3 +46,14 @@ TABLE_HEADERS = [
     "Total Mano de Obra",
     "Total General"
 ]
+
+# Secciones de presupuesto para extracción
+ESTIMATE_SECTIONS = [
+    "Presupuesto",
+    "Materiales",
+    "Mano de Obra",
+    "Detalle de Materiales",
+    "Observaciones",
+    "Condiciones de Pago",
+    "Totales"
+]

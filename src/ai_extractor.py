@@ -89,30 +89,30 @@ class AIExtractor:
         
         Extrae ÚNICAMENTE los siguientes datos en formato JSON:
         
-        1. Datos del proyecto: cliente, celular, telefono_fijo, direccion, fecha, e-mail, orden_trabajo
-        2. Lista de materiales: material, unidades, precio_unitario, precio_total, cantidad_m2, mano_obra, total_material, total_mano_obra, total_general
+        1. Datos del proyecto: nombre_proyecto, cliente, celular, telefono_fijo, direccion, email, fecha, orden_trabajo, total_materiales, total_mano_obra, total_proyecto
+        2. Lista de materiales: material, unidades, precio_unitario, precio_total
         
         Devuelve el resultado como un objeto JSON con la siguiente estructura:
         {{
             "datos_proyecto": {{
-                "client": "string",
-                "phone": "string",
-                "phone_fixed": "string",
-                "address": "string",
+                "nombre_proyecto": "string",
+                "cliente": "string",
+                "celular": "string",
+                "telefono_fijo": "string",
+                "direccion": "string",
                 "email": "string",
-                "date": "string", 
-                "work_order": "string",
-                "quantity_m2": "number",
-                "mano_obra": "number",
-                "total_material": "number",
-                "total_general": "number"
+                "fecha": "string", 
+                "orden_trabajo": "string",
+                "total_materiales": "number",
+                "total_mano_obra": "number",
+                "total_proyecto": "number"
             }},
             "materiales": [
                 {{
                     "material": "string",
-                    "units": "string",
-                    "unit_price": "number",
-                    "total_price": "number",
+                    "unidades": "string",
+                    "precio_unitario": "number",
+                    "precio_total": "number"
                 }}
             ]
         }}
@@ -189,30 +189,30 @@ class AIExtractor:
             
             Extrae ÚNICAMENTE los siguientes datos en formato JSON:
             
-            1. Datos del proyecto: cliente, celular, telefono_fijo, direccion, fecha, e-mail, orden_trabajo
-            2. Lista de materiales: material, unidades, precio_unitario, precio_total, cantidad_m2, mano_obra, total_material, total_mano_obra, total_general
+            1. Datos del proyecto: nombre_proyecto, cliente, celular, telefono_fijo, direccion, email, fecha, orden_trabajo, total_materiales, total_mano_obra, total_proyecto
+            2. Lista de materiales: material, unidades, precio_unitario, precio_total
             
             Devuelve el resultado como un objeto JSON con la siguiente estructura:
             {{
                 "datos_proyecto": {{
-                    "client": "string",
-                    "phone": "string",
-                    "phone_fixed": "string",
-                    "address": "string",
+                    "nombre_proyecto": "string",
+                    "cliente": "string",
+                    "celular": "string",
+                    "telefono_fijo": "string",
+                    "direccion": "string",
                     "email": "string",
-                    "date": "string", 
-                    "work_order": "string",
-                    "quantity_m2": "number",
-                    "mano_obra": "number",
-                    "total_material": "number",
-                    "total_general": "number"
+                    "fecha": "string", 
+                    "orden_trabajo": "string",
+                    "total_materiales": "number",
+                    "total_mano_obra": "number",
+                    "total_proyecto": "number"
                 }},
                 "materiales": [
                     {{
                         "material": "string",
-                        "units": "string",
-                        "unit_price": "number",
-                        "total_price": "number",
+                        "unidades": "string",
+                        "precio_unitario": "number",
+                        "precio_total": "number"
                     }}
                 ]
             }}

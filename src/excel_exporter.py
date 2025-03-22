@@ -80,50 +80,107 @@ class ExcelExporter:
         metadata = self.data.get("metadata", {})
         datos_proyecto = self.data.get("datos_proyecto", {})
         
+        # Registrar los datos recibidos
+        logger.info(f"Datos para hoja Proyecto - Metadata: {metadata}")
+        logger.info(f"Datos para hoja Proyecto - Datos proyecto: {datos_proyecto}")
+        
         # Combinar datos regulares y mejorados por IA
         combined_data = {**metadata}
         if datos_proyecto:
             combined_data.update({k: v for k, v in datos_proyecto.items() if v and not combined_data.get(k)})
         
-        if not combined_data:
-            # Crear una hoja vacía si no hay datos
-            sheet = self.workbook.create_sheet("Proyecto")
-            sheet["A1"] = "No se encontraron datos del proyecto"
-            return
+        logger.info(f"Datos combinados para hoja Proyecto: {combined_data}")
         
         # Crear hoja de proyecto
         sheet = self.workbook.create_sheet("Proyecto")
         
-        # Encabezados
-        sheet["A1"] = "Campo"
-        sheet["B1"] = "Valor"
+        # Definir los encabezados según lo solicitado
+        headers = [
+            "Nombre Proyecto", 
+            "Cliente", 
+            "Celular", 
+            "Tel Fijo", 
+            "Direccion", 
+            "Email", 
+            "Fecha",
+            "Orden Trabajo",
+            "Total Materiales",
+            "Total Mano de Obra",
+            "Total Proyecto"
+        ]
         
-        # Aplicar formato a los encabezados
-        for cell in [sheet["A1"], sheet["B1"]]:
+        # Escribir encabezados
+        for col_idx, header in enumerate(headers, start=1):
+            cell = sheet.cell(row=1, column=col_idx, value=header)
             cell.font = self.header_font
             cell.fill = self.header_fill
             cell.alignment = self.header_alignment
             cell.border = self.border
+            # Ajustar ancho de columna
+            sheet.column_dimensions[get_column_letter(col_idx)].width = max(len(header) + 2, 15)
         
-        # Establecer ancho de columnas
-        sheet.column_dimensions["A"].width = 25
-        sheet.column_dimensions["B"].width = 50
+        # Verificar si hay datos
+        if not combined_data:
+            sheet.cell(row=2, column=1, value="No se encontraron datos del proyecto")
+            return
         
-        # Escribir datos del proyecto
-        row_idx = 2
+        # Mapeo de nombres de campo a los encabezados
+        field_map = {
+            "nombre_proyecto": 0,  # Nombre Proyecto
+            "project_name": 0,     # Alternativa
+            "cliente": 1,          # Cliente
+            "client": 1,           # Alternativa
+            "celular": 2,          # Celular
+            "phone": 2,            # Alternativa
+            "telefono_fijo": 3,    # Tel Fijo
+            "phone_fixed": 3,      # Alternativa
+            "direccion": 4,        # Direccion
+            "address": 4,          # Alternativa
+            "email": 5,            # Email
+            "e-mail": 5,           # Alternativa
+            "fecha": 6,            # Fecha
+            "date": 6,             # Alternativa
+            "orden_trabajo": 7,    # Orden Trabajo
+            "work_order": 7,       # Alternativa
+            "total_materiales": 8, # Total Materiales
+            "total_material": 8,   # Alternativa
+            "total_mano_obra": 9,  # Total Mano de Obra
+            "total_mano_de_obra": 9, # Alternativa
+            "total_proyecto": 10,  # Total Proyecto
+            "total_general": 10,   # Alternativa
+            "total_amount": 10     # Alternativa
+        }
+        
+        # Preparar datos para la fila
+        row_data = [""] * len(headers)
+        
+        # Rellenar con datos disponibles
         for key, value in combined_data.items():
-            if value:  # Solo incluir valores no vacíos
-                # Formatear la clave para mejor legibilidad
-                display_key = key.replace("_", " ").title()
-                
-                sheet.cell(row=row_idx, column=1, value=display_key).border = self.border
-                cell = sheet.cell(row=row_idx, column=2, value=value)
-                cell.border = self.border
-                cell.alignment = Alignment(wrap_text=True)
-                row_idx += 1
+            key_lower = key.lower()
+            if key_lower in field_map and value:
+                row_data[field_map[key_lower]] = value
+        
+        # Escribir datos en la fila 2
+        for col_idx, value in enumerate(row_data, start=1):
+            cell = sheet.cell(row=2, column=col_idx, value=value)
+            cell.border = self.border
+            
+            # Formatear valores numéricos en las columnas de totales
+            if col_idx in [9, 10, 11]:  # Columnas de totales
+                try:
+                    if isinstance(value, str):
+                        # Limpiar y convertir a número si es posible
+                        clean_value = value.replace(",", "").replace("$", "").strip()
+                        if clean_value:
+                            cell.value = float(clean_value)
+                            cell.number_format = "#,##0.00"
+                    cell.alignment = Alignment(horizontal="right")
+                except ValueError:
+                    # Si no se puede convertir a número, dejarlo como está
+                    pass
         
         # Aplicar autofilter
-        sheet.auto_filter.ref = f"A1:B{row_idx - 1}"
+        sheet.auto_filter.ref = f"A1:{get_column_letter(len(headers))}2"
         
         # Congelar la fila de encabezados
         sheet.freeze_panes = "A2"
@@ -132,6 +189,7 @@ class ExcelExporter:
         """Crear hoja para listado y precios de materiales"""
         # Obtener lista de materiales
         materiales = self.data.get("materiales", [])
+        logger.info(f"Datos de materiales extraídos: {materiales}")
         
         if not materiales:
             # Intentar obtener datos de tablas si no hay materiales específicos
@@ -139,6 +197,8 @@ class ExcelExporter:
             all_data = []
             for table in tables:
                 all_data.extend(table.get("data", []))
+            
+            logger.info(f"Datos de tablas para materiales: {all_data}")
             
             if not all_data:
                 # Crear una hoja vacía si no hay datos
